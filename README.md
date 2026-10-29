@@ -1,2 +1,18 @@
-# wf-order-tool
-WF exception order warehouse matching and label processing tool
+# WF 异常订单换仓与面单整理
+
+GitHub Pages 静态网页版本。Excel、PDF 只在浏览器本机内存中处理，不会上传到 GitHub 或其他服务器。
+
+## 功能
+
+- 换仓匹配：根据库存、指定州、内置仓库邮编与 ZIP 距离带计算 Zone。
+- 面单整理：逐页识别 PO、SKU、Tracking，更新异常单的匹配列及 Tracking 列，并按仓库打包 PDF。
+
+## 发布
+
+启用 GitHub Pages，部署来源选择 `main` 分支根目录。
+
+## 注意
+
+- 本仓库公开，包含仓库名称、仓库邮编和归类规则。
+- 上传的业务文件只在浏览器本地处理。
+- 大量 PDF 建议使用电脑浏览器处理。

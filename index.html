@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="WF 异常订单换仓与面单整理工具。文件仅在浏览器本地处理。">
+  <title>WF 异常订单换仓与面单整理</title>
+  <link rel="preconnect" href="https://cdnjs.cloudflare.com">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.1/pdf-lib.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+  <style>
+    :root{--ink:#12231f;--muted:#5d6d68;--line:#d4ded9;--canvas:#f4f7f5;--card:#fff;--green:#087b57;--green-soft:#e7f5ed;--danger:#a72d35;--warn:#8e5c00}*{box-sizing:border-box}body{margin:0;background:var(--canvas);color:var(--ink);font:14px/1.5 "Microsoft YaHei",Arial,sans-serif}main{max-width:1060px;margin:auto;padding:30px 20px 56px}header{display:flex;justify-content:space-between;gap:18px;align-items:flex-start;margin-bottom:24px}.brand{font-size:23px;font-weight:700}.brand span{display:inline-grid;place-items:center;width:34px;height:34px;margin-right:10px;background:var(--green);color:#fff;border-radius:6px;font-size:12px;vertical-align:middle}.local{color:var(--green);font-size:13px;white-space:nowrap}h1{font-size:28px;margin:0;letter-spacing:0}h2{font-size:18px;margin:0}.intro{color:var(--muted);margin:8px 0 0}.notice{background:#fff8e9;border:1px solid #efd99e;border-radius:6px;color:#6e5105;padding:12px 14px;margin:18px 0}.steps{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:18px}.step,.panel{background:var(--card);border:1px solid var(--line);border-radius:7px}.step{display:flex;gap:12px;padding:16px}.step-number{display:grid;place-items:center;width:28px;height:28px;flex:0 0 28px;border-radius:50%;background:var(--green-soft);color:var(--green);font-weight:700}.step p{margin:2px 0 0;color:var(--muted);font-size:13px}.panel{padding:22px;margin-top:18px}.panel-head{display:flex;gap:12px;align-items:flex-start}.panel-head p{margin:3px 0 0;color:var(--muted);font-size:13px}.files{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin-top:18px}.drop{display:flex;min-height:132px;padding:16px;border:1px dashed #aabbb4;border-radius:6px;cursor:pointer;flex-direction:column;justify-content:space-between;background:#fff}.drop:hover,.drop.ready{border-color:var(--green);background:#fbfefc}.drop input{display:none}.drop strong{font-size:15px}.drop small,.file-name{color:var(--muted);display:block;margin-top:5px}.file-name{color:var(--green);overflow-wrap:anywhere;font-size:13px}.hint{color:var(--muted);font-size:12px;margin:13px 0 0}.actions{display:flex;gap:10px;align-items:center;margin-top:18px}button{border:0;border-radius:5px;background:var(--green);color:#fff;font:inherit;font-weight:700;padding:11px 16px;cursor:pointer}button:hover{background:#056445}button:disabled{background:#93a69f;cursor:wait}.status{margin-top:15px;padding:11px 13px;border-radius:5px;background:var(--green-soft);color:#07573e}.status.error{background:#fff0f0;color:var(--danger)}.summary{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:16px}.metric{border:1px solid var(--line);border-radius:5px;padding:12px}.metric span{display:block;color:var(--muted);font-size:12px}.metric strong{display:block;font-size:22px;margin-top:2px}.downloads{display:flex;flex-wrap:wrap;gap:9px;margin-top:16px}.download{border:1px solid var(--green);border-radius:5px;color:#056445;background:#fff;padding:8px 11px;font-weight:700;text-decoration:none;cursor:pointer}.counts{margin:14px 0 0;padding-left:18px;color:var(--muted)}details{margin-top:18px;border-top:1px solid var(--line);padding-top:14px}summary{cursor:pointer;font-weight:700}.rules{margin:10px 0 0;color:var(--muted);font-size:12px}.hidden{display:none}@media(max-width:700px){main{padding:22px 14px 42px}header{display:block}.local{display:block;margin-top:8px}.steps,.files{grid-template-columns:1fr}.summary{grid-template-columns:1fr 1fr}}
+  </style>
+</head>
+<body>
+<main>
+  <header><div><div class="brand"><span>WF</span>WF 异常订单换仓与面单整理</div><p class="intro">免费浏览器版。Excel、PDF 仅在当前设备浏览器中处理，不上传至本网站。</p></div><div class="local">本地浏览器处理</div></header>
+  <div class="notice">首次换仓匹配会下载 ZIP 坐标数据，用于计算 Zone。请使用稳定网络；手机处理大量面单 PDF 可能较慢。</div>
+  <section class="steps"><div class="step"><span class="step-number">1</span><div><strong>换仓匹配</strong><p>上传库存与异常订单，自动计算 Zone 并下载结果。</p></div></div><div class="step"><span class="step-number">2</span><div><strong>面单整理</strong><p>上传独立异常单与 PDF，提取 Tracking、回填并分类打包。</p></div></div></section>
+
+  <section class="panel">
+    <div class="panel-head"><span class="step-number">1</span><div><h2>换仓匹配</h2><p>异常单须包含发货仓库、指定州、产品名称、三方仓SKU、原指定仓邮编及收货邮编或收件人邮编。</p></div></div>
+    <div class="files"><label class="drop" id="inventory-box"><input id="inventory-file" type="file" accept=".xlsx,.xls"><span><strong>海外仓库存</strong><small>需含仓库、产品名称、SKU、可用量及仓库州映射</small></span><span class="file-name">选择 Excel</span></label><label class="drop" id="warehouse-exception-box"><input id="warehouse-exception-file" type="file" accept=".xlsx,.xls"><span><strong>换仓异常单</strong><small>用于更新仓库、SKU 与 Zone 审核列</small></span><span class="file-name">选择 Excel</span></label></div>
+    <div class="actions"><button id="warehouse-run">开始换仓匹配</button></div><div id="warehouse-status" class="status hidden"></div><div id="warehouse-result" class="hidden"><div class="summary"><div class="metric"><span>订单总数</span><strong id="warehouse-total">0</strong></div><div class="metric"><span>匹配成功</span><strong id="warehouse-matched">0</strong></div><div class="metric"><span>替换 SKU</span><strong id="warehouse-replaced">0</strong></div><div class="metric"><span>人工复核</span><strong id="warehouse-manual">0</strong></div></div><div class="downloads"><button class="download" id="warehouse-download">下载换仓后的异常单</button></div></div>
+  </section>
+
+  <section class="panel">
+    <div class="panel-head"><span class="step-number">2</span><div><h2>面单整理</h2><p>可独立运行。异常单须包含 PO、SKU、发货仓库，且仓库列有实际数据。</p></div></div>
+    <div class="files"><label class="drop" id="label-exception-box"><input id="label-exception-file" type="file" accept=".xlsx,.xls"><span><strong>面单匹配异常单</strong><small>回填 Tracking 并作为仓库归类依据</small></span><span class="file-name">选择 Excel</span></label><label class="drop" id="pdf-box"><input id="pdf-files" type="file" accept="application/pdf,.pdf" multiple><span><strong>原始面单 PDF</strong><small>支持同时选择多份多页面 PDF</small></span><span class="file-name">选择 PDF</span></label></div>
+    <div class="actions"><button id="label-run">开始面单整理</button></div><div id="label-status" class="status hidden"></div><div id="label-result" class="hidden"><div class="summary"><div class="metric"><span>PDF 页数</span><strong id="label-pages">0</strong></div><div class="metric"><span>提取 Tracking</span><strong id="label-recognized">0</strong></div><div class="metric"><span>成功匹配</span><strong id="label-matched">0</strong></div><div class="metric"><span>处理异常</span><strong id="label-exceptions">0</strong></div></div><ul id="label-counts" class="counts"></ul><div class="downloads"><button class="download" id="labels-download">下载分类面单 ZIP</button></div></div>
+    <details><summary>内置面单文件夹规则</summary><div class="rules">谷仓、海智链、乐仓及链仓使用已确认的完整仓库名称自动归类。未识别仓库会写入异常清单，不进入正式 ZIP。</div></details>
+  </section>
+</main>
+<script type="module" src="app.js"></script>
+</body>
+</html>
