@@ -30,7 +30,22 @@ function counterObject(items) { const map = new Map(); items.forEach(item => map
 document.querySelectorAll('.drop input').forEach(input => input.addEventListener('change', () => { const box = input.closest('.drop'); const name = box.querySelector('.file-name'); const files = [...input.files]; name.textContent = files.length ? (files.length === 1 ? files[0].name : `已选择 ${files.length} 份文件`) : '选择文件'; box.classList.toggle('ready', files.length > 0); }));
 
 async function workbookFromFile(file) { return XLSX.read(await file.arrayBuffer(), { type: 'array', cellDates: false }); }
-function matrix(book, sheetName) { return XLSX.utils.sheet_to_json(book.Sheets[sheetName], { header: 1, defval: '', raw: false }); }
+function matrix(book, sheetName) {
+  const sheet = book.Sheets[sheetName];
+  const values = [];
+  let maxRow = 0, maxColumn = 0;
+  for (const [address, cell] of Object.entries(sheet)) {
+    if (address.startsWith('!') || !cell || cell.v === undefined) continue;
+    const point = XLSX.utils.decode_cell(address);
+    values.push([point, cell.w ?? cell.v]);
+    maxRow = Math.max(maxRow, point.r);
+    maxColumn = Math.max(maxColumn, point.c);
+  }
+  // WPS may mark the whole sheet as used although only a few cells have data.
+  const rows = Array.from({ length: maxRow + 1 }, () => Array(maxColumn + 1).fill(''));
+  for (const [point, value] of values) rows[point.r][point.c] = value;
+  return rows;
+}
 function findSheet(book, needed) { for (const name of book.SheetNames) { const rows = matrix(book, name); const headers = rows[0] || []; if (needed.every(item => fieldIndex(headers, [item]) >= 0)) return { name, rows, headers }; } return null; }
 function bookBlob(sheets) { const book = XLSX.utils.book_new(); for (const { name, rows } of sheets) XLSX.utils.book_append_sheet(book, XLSX.utils.aoa_to_sheet(rows), name.slice(0, 31)); return new Blob([XLSX.write(book, { bookType: 'xlsx', type: 'array' })], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' }); }
 function addColumn(rows, name) { const headers = rows[0]; let index = headers.findIndex(h => text(h) === name); if (index < 0) { index = headers.length; headers.push(name); for (let i = 1; i < rows.length; i++) rows[i][index] = ''; } return index; }
